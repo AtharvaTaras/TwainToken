@@ -4,7 +4,7 @@ from typing import Optional
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_DIR)
 
-from extras.utils import simple_preprocess
+from helpers.utils import simple_preprocess, simple_postprocess
 
 class SimpleTokenizer():
     def __init__(self, encodings:Optional[str] = None) -> None:
@@ -33,9 +33,18 @@ class SimpleTokenizer():
     
 
     def decode(self, token_ids:list[int]) -> str:
-        reverse_lookup = {v: k for k, v in self.encodings.items()}
+        reverse_lookup = {value: key for key, value in self.encodings.items()}
         tokens = [reverse_lookup.get(token_id, ' ') for token_id in token_ids]
-        return ' '.join(tokens)
+
+        # Capitalize logic
+        tokens[0] = tokens[0].capitalize() if tokens else ''
+
+        for i in range(1, len(tokens)):
+            if tokens[i-1] in ['.', '!', '?']:
+                tokens[i] = tokens[i].capitalize()
+
+        text = ' '.join(tokens)
+        return simple_postprocess(text)
     
 
 if __name__ == '__main__':
