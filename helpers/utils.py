@@ -20,6 +20,11 @@ def simple_preprocess(text:str) -> str:
     return text.lower()
 
 
+def simple_postprocess(text:str) -> str:
+    text = re.sub(r'\s([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r'\1', text)
+    text = re.sub(r'\s(\d{1})', r'\1', text)
+    return text
+
 def generate_vocabulary(text:str) -> dict:
     # Generates a dictionary of unique tokens and their frequencies in the text.
 
