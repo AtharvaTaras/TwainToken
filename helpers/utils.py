@@ -85,3 +85,13 @@ def generate_tokenizer_lookup(vocab:None|dict, text:None|str) -> dict:
 	else:
 		raise ValueError('Either vocab or text must be provided.')
 	
+
+if __name__ == '__main__':
+	text = "Hello, world! It's a test. 100$"
+	print("Original:", text)
+
+	preprocessed = advanced_preprocess(text)
+	print("Preprocessed:", preprocessed)
+
+	postprocessed = advanced_postprocess(preprocessed)
+	print("Postprocessed:", postprocessed)
