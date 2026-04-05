@@ -41,16 +41,39 @@ def advanced_preprocess(text:str) -> str:
 	text = re.sub(r'([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text) # Add spaces around punctuation
 	text = re.sub(r'(\d{1})', r'\1 ', text)                                   # Add spaces after digits
 	text = re.sub(r'\n', '<newline>', text)                                   # Replace newlines with a token
-	text = re.sub(r'[A-Z]', '<caps> \1', text)                                # Add a token before capital letters
+	# text = re.sub(r'([A-Z])', '<caps> \1', text)                              # Add a token before capital letters
+	text = re.sub(r'\b([A-Z][a-z]*)\b', lambda m: '<caps> ' + m.group(1).lower(), text)
 
 	return text.lower()
 
 
 def advanced_postprocess(text:str) -> str:
+	tokens = text.split()
+	result = []
+	i = 0
+
+	while i < len(tokens):
+		if tokens[i] == "<caps>" and i + 1 < len(tokens):
+			next_token = tokens[i + 1]
+
+			# Capitalize ONLY if it's alphabetic
+			if next_token.isalpha():
+				result.append(next_token.capitalize())
+			else:
+				result.append(next_token)
+
+			i += 2  # skip <caps> + next token
+		else:
+			result.append(tokens[i])
+			i += 1
+
+	text = " ".join(result)
 	text = re.sub(r'\s<newline>\s', '\n', text)                               # Replace newline tokens with actual newlines
 	text = re.sub(r'\s<caps>\s([a-z])', r' \1', text)                         # Remove caps tokens and restore original capitalization
 	text = re.sub(r'\s([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r'\1', text) # Remove spaces around punctuation
 	text = re.sub(r'\s(\d{1})', r'\1', text)                                  # Remove spaces after digits
+	text = re.sub(r"([a-zA-Z])'\s([a-zA-Z])", r"\1'\2", text)                 # Fix contractions (e.g., "it's" instead of "it 's")
+	text = re.sub(r'([.!?])(\d)', r'\1 \2', text)                             # Add space after punctuation
 
 	return text
 
