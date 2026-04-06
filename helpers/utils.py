@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 def simple_preprocess(text:str) -> str:
 	# Performs basic text preprocessing
@@ -171,18 +172,20 @@ def generate_vocabulary(text:str) -> dict:
 	return unique
 
 
-def generate_tokenizer_lookup(vocab:None|dict, text:None|str) -> dict:
+def generate_tokenizer_lookup(vocab:Optional[dict]=None, text:Optional[str]=None) -> dict:
 	# Returns tokens sorted by frequency, with the most common token at index 0
 
 	if text is not None:
 		vocab = generate_vocabulary(text)
-		return dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
+		soted_tokens = dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
 	
 	elif vocab is not None:
-		return dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
+		soted_tokens = dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
 	
 	else:
 		raise ValueError('Either vocab or text must be provided.')
+	
+	return {token: idx for idx, (token, _) in enumerate(sorted_tokens)}
 	
 
 if __name__ == '__main__':
