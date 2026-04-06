@@ -41,7 +41,7 @@ def advanced_preprocess(text:str) -> str:
 
 	text = re.sub(r'([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text) # Add spaces around punctuation
 	text = re.sub(r'(\d+)', r'\1 ', text)                                   # Add spaces after digits
-	text = re.sub(r'\n', ' <newline>', text)                                   # Replace newlines with a token
+	text = re.sub(r'\n', ' <newline> ', text)                                   # Replace newlines with a token
 	# text = re.sub(r'([A-Z])', '<caps> \1', text)                              # Add a token before capital letters
 	text = re.sub(r'\b([A-Z][a-z]*)\b', lambda m: ' <caps> ' + m.group(1).lower(), text) 
 
@@ -174,18 +174,14 @@ def generate_vocabulary(text:str) -> dict:
 
 def generate_tokenizer_lookup(vocab:Optional[dict]=None, text:Optional[str]=None) -> dict:
 	# Returns tokens sorted by frequency, with the most common token at index 0
+	if (text is None) and (vocab is None) :
+		raise ValueError('Either vocab or text must be provided.')
 
 	if text is not None:
 		vocab = generate_vocabulary(text)
-		soted_tokens = dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
+		# sorted_tokens = dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
 	
-	elif vocab is not None:
-		soted_tokens = dict(sorted(vocab.items(), key=lambda x: x[1], reverse=True))
-	
-	else:
-		raise ValueError('Either vocab or text must be provided.')
-	
-	return {token: idx for idx, (token, _) in enumerate(sorted_tokens)}
+	return {token: idx for idx, token in enumerate(sorted(vocab, key=vocab.get, reverse=True))}
 	
 
 if __name__ == '__main__':
