@@ -4,7 +4,32 @@ from typing import Optional
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(ROOT_DIR)
 
-from helpers.utils import simple_preprocess, simple_postprocess
+
+def simple_preprocess(text:str) -> str:
+	# Performs basic text preprocessing
+	
+	pairs = [
+	['--', ' '], 
+	['__', ''], 
+	['“', '"'], 
+	['”', '"'],
+	]
+
+	for pair in pairs:
+		text = re.sub(pair[0], pair[1], text)
+
+	text = re.sub(r'([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r' \1 ', text) # Add spaces around punctuation
+	text = re.sub(r'(\d{1})', r'\1 ', text)                                   # Add spaces after digits
+	text = re.sub(r'\s+', ' ', text)                                          # Replace multiple spaces with a single space
+
+	return text.lower()
+
+
+def simple_postprocess(text:str) -> str:
+	text = re.sub(r'\s([!"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~])', r'\1', text)
+	text = re.sub(r'\s(\d{1})', r'\1', text)
+	return text
+
 
 class SimpleTokenizer():
     def __init__(self, encodings:Optional[str] = None) -> None:
